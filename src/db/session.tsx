@@ -17,6 +17,7 @@ export async function login({ username, password }: LoginForm) {
   if (!user) return null;
   const isCorrectPassword = password === user.password;
   if (!isCorrectPassword) return null;
+  await db.user.update({ data: { lastLogin: new Date().toJSON() }, where: { username } });
   return user;
 }
 
