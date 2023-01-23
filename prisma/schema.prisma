@@ -6,8 +6,11 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = "mysql://root:vafan@127.0.0.1:3306/auth?connection_limit=5&socket_timeout=3"
+  provider = "sqlite"
+  url      = "file:./dev.db"
+
+  // provider = "mysql"
+  // url      = "mysql://root:vafan@127.0.0.1:3306/auth?connection_limit=5&socket_timeout=3"
 }
 
 model User {
