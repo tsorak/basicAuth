@@ -1,4 +1,4 @@
-import { Show } from "solid-js";
+import { createSignal, Show } from "solid-js";
 import { useParams, useRouteData } from "solid-start";
 import { FormError } from "solid-start/data";
 import { createServerAction$, createServerData$, redirect } from "solid-start/server";
@@ -79,40 +79,57 @@ export default function Login() {
     }
   });
 
+  const [isLogin, setIsLogin] = createSignal(true);
+
   return (
-    <main>
-      <h1>Login</h1>
-      <Form>
+    <main class="flex-grow flex flex-col items-center justify-center">
+      <Form class="flex flex-col items-center bg-white p-8 rounded-md border border-[hsl(220,5%,89%)] gap-2 w-min">
         <input type="hidden" name="redirectTo" value={params.redirectTo ?? "/"} />
-        <fieldset>
-          <legend>Login or Register?</legend>
-          <label>
-            <input type="radio" name="loginType" value="login" checked={true} /> Login
+        <h1 class="text-3xl">Basic Auth</h1>
+        <div class="flex flex-col w-full mt-5">
+          <label class="select-none text-sm" for="username-input">
+            Username
           </label>
-          <label>
-            <input type="radio" name="loginType" value="register" /> Register
+          <input class="focus:outline-none border border-[hsl(220,5%,89%)] rounded p-1 w-72" name="username" autocomplete="off" />
+        </div>
+        <Show when={loggingIn.error?.fieldErrors?.username} fallback={<div class="spacer h-5 w-full" />}>
+          <p role="alert" class="text-sm">
+            {loggingIn.error.fieldErrors.username}
+          </p>
+        </Show>
+        <div class="flex flex-col w-full">
+          <label class="select-none text-sm" for="password-input">
+            Password
           </label>
-        </fieldset>
-        <div>
-          <label for="username-input">Username</label>
-          <input name="username" placeholder="Username" />
+          <input class="focus:outline-none border border-[hsl(220,5%,89%)] rounded p-1 w-72" name="password" type="password" />
         </div>
-        <Show when={loggingIn.error?.fieldErrors?.username}>
-          <p role="alert">{loggingIn.error.fieldErrors.username}</p>
+        <Show when={loggingIn.error?.fieldErrors?.password} fallback={<div class="spacer h-5 w-full" />}>
+          <p role="alert" class="text-sm">
+            {loggingIn.error.fieldErrors.password}
+          </p>
         </Show>
-        <div>
-          <label for="password-input">Password</label>
-          <input name="password" type="password" placeholder="Password" />
+        <div class="grid grid-cols-[repeat(2,1fr)] bg-[hsl(210,20%,93%)] rounded-md overflow-hidden h-8 w-full">
+          <div class="flex flex-col items-center">
+            <input type="radio" name="loginType" value="login" id="login" checked={isLogin()} class="peer hidden" onChange={() => setIsLogin(true)} />
+            <label for="login" class="flex items-center flex-grow w-full px-2 peer-checked:bg-blue-500 peer-checked:text-white transition-colors cursor-pointer peer-checked:cursor-default">
+              <span class="mx-auto w-min">Login</span>
+            </label>
+          </div>
+          <div class="flex flex-col items-center">
+            <input type="radio" name="loginType" value="register" id="register" class="peer hidden" onChange={() => setIsLogin(false)} />
+            <label for="register" class="flex items-center flex-grow w-full px-2 peer-checked:bg-blue-500 peer-checked:text-white transition-colors cursor-pointer peer-checked:cursor-default">
+              <span class="mx-auto w-min">Register</span>
+            </label>
+          </div>
         </div>
-        <Show when={loggingIn.error?.fieldErrors?.password}>
-          <p role="alert">{loggingIn.error.fieldErrors.password}</p>
-        </Show>
-        <Show when={loggingIn.error}>
-          <p role="alert" id="error-message">
+        <Show when={loggingIn.error} fallback={<div class="spacer h-5 w-full" />}>
+          <p role="alert" id="error-message" class="text-sm">
             {loggingIn.error.message}
           </p>
         </Show>
-        <button type="submit">{data() ? "Login" : ""}</button>
+        <button type="submit" class="bg-blue-500 w-full">
+          {data() ? (isLogin() ? "Login" : "Register") : ""}
+        </button>
       </Form>
     </main>
   );
